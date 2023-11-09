@@ -1,0 +1,39 @@
+
+services:
+  web: 
+    build:
+      context: TelegramBot
+    ports: 
+      - '17620:17620'
+    volumes:
+      - static:/TelegramBot/static/
+    networks: 
+      - nginx_network
+    restart: always
+
+  bot: 
+    build:
+      context: TelegramBot
+      dockerfile: TelegramBot/Dockerfile
+    tty: true
+    restart: always
+
+  nginx:
+    container_name: nginx
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - nginx_network
+    volumes:
+      - static:/TelegramBot/static/
+    depends_on:
+      - web
+
+volumes:
+  static:
+networks:
+  nginx_network:
+    external: true

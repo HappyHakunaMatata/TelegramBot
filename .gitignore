@@ -1,0 +1,4 @@
+*.session
+*.pyc
+*.DS_Store
+.env

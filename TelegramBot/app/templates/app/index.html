@@ -1,0 +1,651 @@
+﻿{% extends "app/layout.html" %}
+{% block content %}
+{% load static %}
+{% load templatetags %}
+
+
+<header class="app-header">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item d-block d-xl-none">
+                <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse">
+                    <i class="ti ti-menu-2"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link nav-icon-hover">
+                    <i class="ti ti-bell-ringing"></i>
+                    <div class="notification bg-primary rounded-circle"></div>
+                </a>
+            </li>
+        </ul>
+        <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-icon-hover" id="drop2" data-bs-toggle="dropdown">
+                        <img src="{% static 'app/ModernizeTheme/images/profile/user-1.jpg' %}" alt="" width="35" height="35" class="rounded-circle">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<!--  Header End -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+                <div class="card-body">
+                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                        <div class="mb-3 mb-sm-0">
+                            <h5 class="card-title fw-semibold">Ежедневные сообщения</h5>
+                        </div>
+                        <div class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+                            <nav class="navbar navbar-expand-lg navbar-light">
+                                <ul class="navbar-nav">
+                                    <!--Add Daily Message-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="create">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/add-circle-svgrepo-com.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="add-modal-daily-message" tabindex="-1" aria-labelledby="AddModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="AddModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post" class="was-validated needs-validation">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "AddDailyMessage" %}">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <label for="add-daily-messages-text" class="form-label mt-4">Введите сообщение</label>
+                                                                <input class="form-control" id="add-daily-messages-text" name="text" autocomplete="off" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="add-daily-timestamp">Укажите время</label>
+                                                                <input type="text" class="form-control" name="timestamp" placeholder="00:00" id="add-daily-timestamp" autocomplete="off" pattern="^(0|[1-9]\d{0,5})$" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="add-message">Добавить</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Add Daily Message-->
+                                    <!--Edit Daily Message-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="edit">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/edit-button.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="edit-modal-daily-message" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="EditModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post" class="was-validated needs-validation">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "EditDailyMessage" %}">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <input type="hidden" class="form-control" id="edit-daily-messages-key" name="key" autocomplete="off" style="display:none" readonly="">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="edit-daily-messages-text" class="form-label mt-4">Введите сообщение</label>
+                                                                <input class="form-control" id="edit-daily-messages-text" name="edittext" autocomplete="off" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="edit-daily-timestamp">Укажите время</label>
+                                                                <input type="text" class="form-control" name="edittimestamp" placeholder="00:00" id="edit-daily-timestamp" autocomplete="off" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="edit-message">Редактировать</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" id="notification-modal-daily-message" tabindex="-1" aria-labelledby="NotificationModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="NotificationModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="form-group">
+                                                            <div class="form-label mt-4">Пожалуйста выберете сообщение</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Edit Daily Message-->
+                                    <!--Delete Daily Message-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="delete">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/delete-svgrepo-com.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="delete-modal-daily-message" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="DeleteModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "DeleteDailyMessage" %}">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <div class="form-label mt-4">Вы уверены что хотите удалить сообщение ?</div>
+                                                                <input type="hidden" class="form-control" name="primaryKey" id="delete-input-message" readonly="" style="display:none" autocomplete="off">
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="delete-message">Удалить</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Delete Daily Message-->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table text-nowrap mb-0 align-middle table-hover" id="daily-message-table">
+                            <thead class="text-dark fs-4">
+                                <tr>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Id</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Сообщение</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Таймер</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Дата создания</h6>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tableDailymessages %}
+                                <tr class="selectable-row">
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">{{ item.primaryKey }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-1">{{ item.text }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <p class="mb-0 fw-normal">{{ item.timestamp|date:"H:i" }}</p>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-primary rounded-3 fw-semibold">{{ item.CreateDateTime }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card overflow-hidden">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-9 fw-semibold">Удаление пользователей</h5>
+                            <div class="col-8">
+                                <p class="card-text">
+                                    Удаление пользователей
+                                    осуществляется в 2
+                                    часа ночи:
+                                </p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="text-dark me-1 fs-3 mb-0" id="htimer"></div>
+                                    <p class="fs-3 mb-0">h.</p>
+                                    <div class="text-dark me-1 fs-3 mb-0" id="mintimer"></div>
+                                    <p class="fs-3 mb-0">min.</p>
+                                    <div class="text-dark me-1 fs-3 mb-0" id="sectimer"></div>
+                                    <p class="fs-3 mb-0">sec.</p>
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 0%; animation: progress-bar-stripes 1s linear infinite;" id="AnimatedProgressbar" aria-label="Progressbar"></div>
+                            </div>
+                            <div class="col-8">
+                                <div class="form-check form-switch d-flex align-items-center">
+                                    <input class="form-check-input me-1 fs-3 mb-0" type="checkbox" id="flexSwitchCheckDefault" name="ProgressbarStatus" checked>
+                                    <label class="form-check-label me-1 fs-3 mb-0" for="flexSwitchCheckDefault">Отключить удаление</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 d-flex align-items-stretch">
+            <div class="card w-100">
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h5 class="card-title fw-semibold">Отправить сообщение в чат</h5>
+                    </div>
+                    <form method="post" class="was-validated needs-validation">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="{% form_type "SendMessage" %}">
+                        <div class="form-group">
+                            <label for="messagearea" class="form-label mt-4">Введите сообщение</label>
+                            <textarea class="form-control" id="messagearea" rows="3" name="sendMessage" style="height: 121px;" required></textarea>
+                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="send-message">Отправить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+                <div class="card-body">
+                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                        <div class="mb-3 mb-sm-0">
+                            <h5 class="card-title fw-semibold mb-4">Отправить сообщение по дате</h5>
+                        </div>
+                        <div class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+                            <nav class="navbar navbar-expand-lg navbar-light">
+                                <ul class="navbar-nav">
+                                    <!--Add Datetime-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="create-datetime">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/add-circle-svgrepo-com.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="add-modal-datetime-message" tabindex="-1" aria-labelledby="AddDatetimeModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="AddDatetimeModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post" class="was-validated needs-validation">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "AddDatetimeMessage" %}">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <label for="add-datetime-messages-text" class="form-label mt-4">Введите сообщение</label>
+                                                                <input class="form-control" id="add-datetime-messages-text" name="textfield" autocomplete="off" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="edit-datetime-timestamp">Укажите время</label>
+                                                                <input type="text" class="form-control" name="timestampfield" placeholder="00:00" id="add-datetime-timestamp" autocomplete="off" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="input">Укажите дату</label>
+                                                                <input type="text" class="form-control" name="datefield" id="input" data-rome-id="0" autocomplete="off" pattern="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="addEvent">Добавить</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Add Datetime-->
+                                    <!--Edit Add Datetime-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="edit-datetime">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/edit-button.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="edit-modal-datetime-message" tabindex="-1" aria-labelledby="EditDatetimeModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="EditDatetimeModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post" class="was-validated needs-validation">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "EditDatetimeMessage" %}">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <input type="hidden" class="form-control" id="edit-datetime-messages-key" name="idDatetime" autocomplete="off" style="display:none" readonly="" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="edit-datetime-messages-text" class="form-label mt-4">Введите сообщение</label>
+                                                                <input class="form-control" id="edit-datetime-messages-text" name="textfield" autocomplete="off" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="edit-datetime-timestamp">Укажите время</label>
+                                                                <input type="text" class="form-control" name="timestampfield" placeholder="00:00" id="edit-datetime-timestamp" autocomplete="off" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="inputdate">Укажите дату</label>
+                                                                <input type="text" class="form-control" name="editdatefield" id="inputdate" data-rome-id="1" autocomplete="off" pattern="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="edit-date-message">Редактировать</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Edit Add Datetime-->
+                                    <!--Delete Datetime-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="delete-datetime">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/delete-svgrepo-com.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="delete-modal-datetime-message" tabindex="-1" aria-labelledby="DeleteDatetimeModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="DeleteDatetimeModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "DeleteDatetimeMessage" %}">
+                                                        <div class="modal-body">
+                                                            <fieldset>
+                                                                <div class="form-group">
+                                                                    <div class="form-label mt-4">Вы уверены что хотите удалить сообщение ?</div>
+                                                                    <input type="hidden" class="form-control" name="Pkey" id="delete-datetime-input-message" style="display:none" autocomplete="off">
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block">Удалить</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Delete Datetime-->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table text-nowrap mb-0 align-middle table-hover" id="datetime-message-table">
+                            <thead class="text-dark fs-4">
+                                <tr>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Id</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Сообщение</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Время</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Дата</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Дата создания</h6>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tableDatetimemessages %}
+                                <tr class="selectable-row">
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">{{ item.primaryKey }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-1">{{ item.textfield }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <p class="mb-0 fw-normal">{{ item.timestampfield|date:"H:i" }}</p>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <p class="mb-0 fw-normal">{{ item.datefield|date:"Y-m-d" }}</p>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-primary rounded-3 fw-semibold">{{ item.CreateDateTime }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+                <div class="card-body">
+                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                        <div class="mb-3 mb-sm-0">
+                            <h5 class="card-title fw-semibold">Еженедельные сообщения</h5>
+                        </div>
+                        <div class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+                            <nav class="navbar navbar-expand-lg navbar-light">
+                                <ul class="navbar-nav">
+                                    <!--Add Weekly Message-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="create-weekly">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/add-circle-svgrepo-com.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="add-modal-weekly-message" tabindex="-1" aria-labelledby="AddModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="AddModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post" class="was-validated needs-validation">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "AddWeeklyMessage" %}">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <label for="add-weekly-messages-text" class="form-label mt-4">Введите сообщение</label>
+                                                                <input class="form-control" id="add-weekly-messages-text" name="AddWeeklyMessage" autocomplete="off" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="add-weekly-timestamp">Укажите время</label>
+                                                                <input type="text" class="form-control" name="AddTimestamp" placeholder="00:00" id="add-weekly-timestamp" autocomplete="off" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="add-weekly-week">Выберете неделю</label>
+                                                                <select class="form-select" name="AddWeek" id="add-weekly-week" autocomplete="off" required>
+                                                                    <option>Понедельник</option>
+                                                                    <option>Вторник</option>
+                                                                    <option>Среда</option>
+                                                                    <option>Четверг</option>
+                                                                    <option>Пятница</option>
+                                                                    <option>Суббота</option>
+                                                                    <option>Воскресенье</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="add-message">Добавить</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Add Weekly Message-->
+                                    <!--Edit Weekly Message-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="edit-weekly">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/edit-button.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="edit-modal-weekly-message" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="EditModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post" class="was-validated needs-validation">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "EditWeeklyMessage" %}">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <input type="hidden" class="form-control" id="edit-weekly-messages-key" name="idWeekly" autocomplete="off" style="display:none" readonly="">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="edit-weekly-messages-text" class="form-label mt-4">Введите сообщение</label>
+                                                                <input class="form-control" id="edit-weekly-messages-text" name="AddWeeklyMessage" autocomplete="off" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="edit-weekly-timestamp">Укажите время</label>
+                                                                <input type="text" class="form-control" name="AddTimestamp" placeholder="00:00" id="edit-weekly-timestamp" autocomplete="off" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-form-label mt-4" for="edit-weekly-week">Выберете неделю</label>
+                                                                <select class="form-select" name="AddWeek" id="edit-weekly-week" autocomplete="off" required>
+                                                                    <option>Понедельник</option>
+                                                                    <option>Вторник</option>
+                                                                    <option>Среда</option>
+                                                                    <option>Четверг</option>
+                                                                    <option>Пятница</option>
+                                                                    <option>Суббота</option>
+                                                                    <option>Воскресенье</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="edit-message">Редактировать</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Edit Weekly Message-->
+                                    <!--Delete Weekly Message-->
+                                    <li class="nav-item">
+                                        <a class="nav-link nav-icon-hover" id="delete-weekly">
+                                            <img src="{% static 'app/ModernizeTheme/images/buttons/delete-svgrepo-com.svg' %}" alt="" width="24" height="24">
+                                        </a>
+                                        <div class="modal fade" id="delete-modal-weekly-message" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true" aria-modal="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="DeleteModalLabel">Уведомление</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                    </div>
+                                                    <form method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="{% form_type "DeleteWeeklyMessage" %}">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <div class="form-label mt-4">Вы уверены что хотите удалить сообщение ?</div>
+                                                                <input type="hidden" class="form-control" name="idDeleteWeekly" id="delete-weekly-message" readonly="" style="display:none" autocomplete="off">
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="delete-message">Удалить</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!--End Delete Weekly Message-->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table text-nowrap mb-0 align-middle table-hover" id="weekly-message-table">
+                            <thead class="text-dark fs-4">
+                                <tr>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Id</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Сообщение</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Таймер</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Неделя</h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">Дата создания</h6>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tableWeeklymessages %}
+                                <tr class="selectable-row">
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">{{ item.primaryKey }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-1">{{ item.AddWeeklyMessage }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <p class="mb-0 fw-normal">{{ item.AddTimestamp|date:"H:i" }}</p>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <p class="mb-0 fw-normal">{{ item.AddWeek }}</p>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-primary rounded-3 fw-semibold">{{ item.CreateDateTime }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="py-6 px-6 text-center">
+        <p class="mb-0 fs-4">&copy; {{ year }} - Telegram Bot</p>
+    </div>
+</div>
+{% endblock %}

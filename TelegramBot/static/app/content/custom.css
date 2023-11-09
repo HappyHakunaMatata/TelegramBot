@@ -1,0 +1,7 @@
+.selectable-row:not(.selected) {
+    cursor: pointer;
+}
+
+.selectable-row.selected {
+    background-color: #5d87ff;
+}
