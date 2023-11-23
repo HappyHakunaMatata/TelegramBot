@@ -6,7 +6,7 @@ Definition of views.
 from datetime import datetime
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest
-from app.models import DailyMessages, DateTimeMessages, WeeklyMessages, ProgressBarStatus
+from app.models import DailyMessages, DateTimeMessages, WeeklyMessages, ProgressBarStatus, KickTimeTable
 from .forms import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -20,11 +20,10 @@ from app.decorators import telethon_login_requierd
 
 #@telethon_login_requierd
 def home(request):
-    
     tableDailymessages = DailyMessages.objects.all()
     tableDatetimemessages = DateTimeMessages.objects.all()
     tableWeeklymessages = WeeklyMessages.objects.all()
-
+    PBStatus = ProgressBarStatus.objects.first()
     addDailyMessagesForm = AddDailyMessagesForm()
     editDailyMessagesForm = EditDailyMessagesForm()
     deleteDailyMessagesForm = DeleteDailyMessagesForm()
@@ -32,11 +31,13 @@ def home(request):
     editDatetimeMessagesForm = EditDatetimeMessagesForm()
     deleteDatetimeMessagesForm = DeleteDatetimeMessagesForm()
     sendMessageForm = SendMessageForm()
-    
     addWeeklyMessagesForm = AddWeeklyMessagesForm()
     editWeeklyMessagesForm = EditWeeklyMessagesForm()
     deleteWeeklyForm = DeleteWeeklyForm()
     
+    progressBarStatus = ProgressBarStatusForm()
+    kickTimeTableForm = KickTimeTableForm()
+    KickTime = KickTimeTable.objects.first()
 
     message = ''
     if request.method == 'POST':
@@ -115,6 +116,22 @@ def home(request):
                 daily_message.save()
                 message = "Сообщение отредактировано"
         
+        elif (request.POST.get('form_type') == 'KickToggler'):
+            progressBarStatus = ProgressBarStatusForm(request.POST)
+            if progressBarStatus.is_valid():
+                entity = get_object_or_404(ProgressBarStatus, ProgressbarPKey=1)
+                entity.ProgressbarStatus = True if progressBarStatus.cleaned_data['ProgressbarStatus'] == 1 else False
+                PBStatus = entity
+                entity.save()
+                message = "Параметр сохранен"
+        elif (request.POST.get('form_type') == 'EditToggleTime'):
+            form = KickTimeTableForm(request.POST)
+            if form.is_valid():
+                entity = get_object_or_404(KickTimeTable, PKey=1)
+                entity.Time = form.cleaned_data['edittoggletime']
+                KickTime = entity
+                entity.save()
+                message = "Время сохранено"
         else:
             message = "Произошла ошибка"
     assert isinstance(request, HttpRequest)
@@ -133,11 +150,14 @@ def home(request):
             'sendMessageForm': sendMessageForm,
             'tableDailymessages': tableDailymessages,
             'tableDatetimemessages': tableDatetimemessages,
+            'progressBarStatus': progressBarStatus,
             'message': message,
-            
+            'PBStatus': PBStatus,
+            'kickTimeTableForm': kickTimeTableForm,
             'tableWeeklymessages': tableWeeklymessages,
             'addWeeklyMessagesForm': addWeeklyMessagesForm,
-            'editWeeklyMessagesForm': editWeeklyMessagesForm
+            'editWeeklyMessagesForm': editWeeklyMessagesForm,
+            'kickTime': KickTime,
         }
     )
 
@@ -201,6 +221,7 @@ def get_data(request):
     return Response(serializer.data)
 
 
+"""
 @api_view(['GET'])
 def Get_ProgressbarStatus(request):
     data = get_list_or_404(ProgressBarStatus)
@@ -220,3 +241,4 @@ def Post_ProgressbarStatus(request):
             progressbar.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    """    

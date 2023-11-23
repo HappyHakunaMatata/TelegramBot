@@ -65,7 +65,7 @@
                                                             </div>
                                                             <div class="form-group">
                                                                 <label class="col-form-label mt-4" for="add-daily-timestamp">Укажите время</label>
-                                                                <input type="text" class="form-control" name="timestamp" placeholder="00:00" id="add-daily-timestamp" autocomplete="off" pattern="^(0|[1-9]\d{0,5})$" required>
+                                                                <input type="text" class="form-control" name="timestamp" placeholder="00:00" id="add-daily-timestamp" autocomplete="off" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" required>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
@@ -217,33 +217,99 @@
                 <div class="col-lg-12">
                     <div class="card overflow-hidden">
                         <div class="card-body p-4">
-                            <h5 class="card-title mb-9 fw-semibold">Удаление пользователей</h5>
-                            <div class="col-8">
-                                <p class="card-text">
-                                    Удаление пользователей
-                                    осуществляется в 2
-                                    часа ночи:
-                                </p>
-                                <div class="d-flex align-items-center mb-3">
-                                    <div class="text-dark me-1 fs-3 mb-0" id="htimer"></div>
-                                    <p class="fs-3 mb-0">h.</p>
-                                    <div class="text-dark me-1 fs-3 mb-0" id="mintimer"></div>
-                                    <p class="fs-3 mb-0">min.</p>
-                                    <div class="text-dark me-1 fs-3 mb-0" id="sectimer"></div>
-                                    <p class="fs-3 mb-0">sec.</p>
+                            <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                                <div class="mb-3 mb-sm-0">
+                                    <h5 class="card-title mb-9 fw-semibold">Удаление пользователей</h5>
+                                </div>
+                                <div class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+                                    <nav class="navbar navbar-expand-lg navbar-light">
+                                        <ul class="navbar-nav">
+                                            <!--Edit Daily Message-->
+                                            <li class="nav-item">
+                                                <a class="nav-link nav-icon-hover" id="edit-toggle">
+                                                    <img src="{% static 'app/ModernizeTheme/images/buttons/edit-button.svg' %}" alt="" width="24" height="24">
+                                                </a>
+                                                <div class="modal fade" id="edit-toggle-time" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true" aria-modal="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="EditModalLabel">Уведомление</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                            </div>
+                                                            <form method="post" class="was-validated needs-validation">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="form_type" value="{% form_type "EditToggleTime" %}">
+                                                                <div class="modal-body">
+                                                                    <div class="form-group">
+                                                                        <label class="col-form-label mt-4" for="edit-daily-timestamp">Укажите время</label>
+                                                                        <input type="text" class="form-control" name="edittoggletime" placeholder="00:00" id="edit-toggle-timestamp" autocomplete="off" pattern="^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                                    <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="edit-message">Редактировать</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal fade" id="notification-modal-daily-message" tabindex="-1" aria-labelledby="NotificationModalLabel" aria-hidden="true" aria-modal="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="NotificationModalLabel">Уведомление</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="form-group">
+                                                                    <div class="form-label mt-4">Пожалуйста выберете сообщение</div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <!--End Edit Daily Message-->
+                                        </ul>
+                                    </nav>
                                 </div>
                             </div>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 0%; animation: progress-bar-stripes 1s linear infinite;" id="AnimatedProgressbar" aria-label="Progressbar"></div>
-                            </div>
-                            <div class="col-8">
-                                <div class="form-check form-switch d-flex align-items-center">
-                                    <input class="form-check-input me-1 fs-3 mb-0" type="checkbox" id="flexSwitchCheckDefault" name="ProgressbarStatus" checked>
-                                    <label class="form-check-label me-1 fs-3 mb-0" for="flexSwitchCheckDefault">Отключить удаление</label>
+                                <div class="col-8">
+                                    <p class="card-text">
+                                        Удаление пользователей
+                                        осуществляется в <div id="toggle-timer"><b style="color:blue">{{kickTime.Time|date:"H:i"}}</b></div>
+                                    </p>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="text-dark me-1 fs-3 mb-0" id="htimer"></div>
+                                        <p class="fs-3 mb-0">h.</p>
+                                        <div class="text-dark me-1 fs-3 mb-0" id="mintimer"></div>
+                                        <p class="fs-3 mb-0">min.</p>
+                                        <div class="text-dark me-1 fs-3 mb-0" id="sectimer"></div>
+                                        <p class="fs-3 mb-0">sec.</p>
+                                    </div>
                                 </div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 0%; animation: progress-bar-stripes 1s linear infinite;" id="AnimatedProgressbar" aria-label="Progressbar"></div>
+                                </div>
+
+                                <form method="post" class="was-validated needs-validation">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_type" value="{% form_type "KickToggler" %}">
+                                    <input type="hidden" name="ProgressbarStatus" id="hiddenProgressBarStatus" value="{{PBStatus.ProgressbarStatus}}">
+                                    <div class="col-8">
+                                        <div class="form-check form-switch d-flex align-items-center">
+                                            <input class="form-check-input me-1 fs-3 mb-0" type="checkbox" id="flexSwitchCheckDefault" checked>
+                                            <label class="form-check-label me-1 fs-3 mb-0" for="flexSwitchCheckDefault" id="toggle-label"></label>
+                                            <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block" id="edit-toggle">Сохранить</button>
+                                        </div>
+                                    </div>
+                                </form>
+
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
         </div>

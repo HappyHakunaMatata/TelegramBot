@@ -18,9 +18,9 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
     path('admin/', admin.site.urls),
     
-    path('api/data/', views.get_data, name='get_data'),
-    path('api/GetProgressbar/', views.Get_ProgressbarStatus, name='GetProgress_bar'),
-    path('api/PostProgressbar/', views.Post_ProgressbarStatus, name='PostProgress_bar'),
+    #path('api/data/', views.get_data, name='get_data'),
+    #path('api/GetProgressbar/', views.Get_ProgressbarStatus, name='GetProgress_bar'),
+    #path('api/PostProgressbar/', views.Post_ProgressbarStatus, name='PostProgress_bar'),
     
 ]
 

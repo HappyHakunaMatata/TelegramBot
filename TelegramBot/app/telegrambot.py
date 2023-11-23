@@ -231,11 +231,13 @@ def asyncBitrix(message_text=""):
 
 
 def set_kick_schedule():
-    from app.models import ProgressBarStatus
+    from app.models import ProgressBarStatus, KickTimeTable
     progressBarStatus = ProgressBarStatus.objects.all()
+    kickentity = KickTimeTable.objects.first()
+    time = kickentity.Time.strftime("%H:%M")
     first_element = progressBarStatus[0] if progressBarStatus else None
     if (first_element.ProgressbarStatus == True):
-        schedule.every().day.at("02:00").do(asyncBitrix)
+        schedule.every().day.at(time).do(asyncBitrix)
 
 
 def update_schedule():

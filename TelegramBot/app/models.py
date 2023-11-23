@@ -32,3 +32,7 @@ class WeeklyMessages(models.Model):
 class ProgressBarStatus(models.Model):
     ProgressbarPKey = models.AutoField(primary_key=True)
     ProgressbarStatus = models.BooleanField(default=False)
+    
+class KickTimeTable(models.Model):
+    PKey = models.AutoField(primary_key=True)
+    Time = models.DateTimeField()

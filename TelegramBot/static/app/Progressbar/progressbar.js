@@ -1,24 +1,34 @@
 ﻿
 
-var htimerElement = document.getElementById("htimer");
-var mintimerElement = document.getElementById("mintimer");
-var sectimerElement = document.getElementById("sectimer");
-var bar = document.getElementById("AnimatedProgressbar");
+
 
 function updateTimer() {
+    var htimerElement = document.getElementById("htimer");
+    var mintimerElement = document.getElementById("mintimer");
+    var sectimerElement = document.getElementById("sectimer");
+    var bar = document.getElementById("AnimatedProgressbar");
+
+    var timer = document.getElementById("toggle-timer");
+    var timerText = timer.innerText;
+    var timeArray = timerText.split(":");
+    var timer_hours = parseInt(timeArray[0], 10);
+    var timer_minutes = parseInt(timeArray[1], 10);
+
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
     const day = now.getDate();
-    var tomorrow
     const hour = now.getHours();
-    if (hour >= 2) {
+    const min = now.getMinutes();
+
+    var tomorrow
+    if (hour >= timer_hours && min >= timer_minutes) {
         tomorrow = new Date(year, month, day + 1);
     }
     else {
         tomorrow = new Date(year, month, day);
     }
-    tomorrow.setHours(2, 0, 0, 0);
+    tomorrow.setHours(timer_hours, timer_minutes, 0, 0);
     var timeDiff = tomorrow - now
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff / (1000 * 60)) % 60);
@@ -32,31 +42,34 @@ function updateTimer() {
     bar.style.width = progressBarWidth + "%";
 }
 
+
 document.getElementById("flexSwitchCheckDefault").addEventListener("change", function () {
     var switchCheckbox = this;
+    var status = document.getElementById("hiddenProgressBarStatus");
+    var lable = document.getElementById("toggle-label");
 
-    var dataToSend = {
-        ProgressbarStatus: null
-    };
     if (switchCheckbox.checked) {
+        updateTimer();
         timerInterval = setInterval(updateTimer, 1000);
-        dataToSend.ProgressbarStatus = true
-        ConnectToDatabase('/api/PostProgressbar/', 'POST', dataToSend)
+        status.value = 1
+        lable.innerText = "Удаление включено"
+        //ConnectToDatabase('/api/PostProgressbar/', 'POST', dataToSend)
     } else {
         clearInterval(timerInterval);
-        dataToSend.ProgressbarStatus = false
-        ConnectToDatabase('/api/PostProgressbar/', 'POST', dataToSend)
+        status.value = 0
+        lable.innerText = "Удаление отключено"
+        //ConnectToDatabase('/api/PostProgressbar/', 'POST', dataToSend)
     }
 });
-
+/*
 function ConnectToDatabase(link, type, status) {
     $.ajax({
         url: link,
         type: type,
         dataType: 'json',
         data: status,
-        contentType: 'application/json',
         success: function (data) {
+            console.log(data)
             if (type == 'GET') {
                 GetData(data);
             }
@@ -65,22 +78,27 @@ function ConnectToDatabase(link, type, status) {
             console.error(error);
         }
     });
-}
+}*/
 
-function GetData(data) {
+
+(function GetData() {
     var checkbox = document.getElementById("flexSwitchCheckDefault");
-    var firstItemOrNull = data.length > 0 ? data[0] : null;
-    var progressbarStatus = firstItemOrNull.ProgressbarStatus;
-    if (progressbarStatus == true) {
+    var status = document.getElementById("hiddenProgressBarStatus");
+    var lable = document.getElementById("toggle-label");
+    if (status.value == "True") {
         checkbox.setAttribute("checked", "checked");
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+        lable.innerText = "Удаление включено"
     }
     else {
         clearInterval(timerInterval);
         checkbox.removeAttribute("checked");
+        lable.innerText = "Удаление отключено"
     }
-}
+})();
 
 
-ConnectToDatabase('/api/GetProgressbar/', 'GET')
-updateTimer();
-var timerInterval = setInterval(updateTimer, 1000);
+//ConnectToDatabase('/api/GetProgressbar/', 'GET')
+var timerInterval;
+

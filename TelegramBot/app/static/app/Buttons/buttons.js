@@ -166,4 +166,9 @@ $('#delete-datetime').on('click', function (e) {
         }
     });
 
+    $('#edit-toggle').on('click', function (e) {
+        modal = new bootstrap.Modal(document.getElementById('edit-toggle-time'))
+        modal.show()
+    });
+
 }())

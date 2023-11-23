@@ -6,7 +6,7 @@ from sqlite3 import Timestamp
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
-from .models import DailyMessages, DateTimeMessages, WeeklyMessages
+from .models import DailyMessages, DateTimeMessages, WeeklyMessages, ProgressBarStatus, KickTimeTable
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
@@ -83,4 +83,10 @@ class EditWeeklyMessagesForm(forms.Form):
     AddWeeklyMessage = forms.CharField(max_length=1000)
     AddTimestamp =  forms.DateTimeField(input_formats=['%H:%M'])
     AddWeek = forms.CharField(max_length=1000)
+    
+class ProgressBarStatusForm(forms.Form):
+    ProgressbarStatus = forms.IntegerField(max_value=1, min_value=0)
+    
+class KickTimeTableForm(forms.Form):
+    edittoggletime =  forms.DateTimeField(input_formats=['%H:%M'])
     
