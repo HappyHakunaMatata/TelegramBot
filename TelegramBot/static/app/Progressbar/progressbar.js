@@ -53,32 +53,15 @@ document.getElementById("flexSwitchCheckDefault").addEventListener("change", fun
         timerInterval = setInterval(updateTimer, 1000);
         status.value = 1
         lable.innerText = "Удаление включено"
-        //ConnectToDatabase('/api/PostProgressbar/', 'POST', dataToSend)
+       
     } else {
         clearInterval(timerInterval);
         status.value = 0
         lable.innerText = "Удаление отключено"
-        //ConnectToDatabase('/api/PostProgressbar/', 'POST', dataToSend)
+       
     }
 });
-/*
-function ConnectToDatabase(link, type, status) {
-    $.ajax({
-        url: link,
-        type: type,
-        dataType: 'json',
-        data: status,
-        success: function (data) {
-            console.log(data)
-            if (type == 'GET') {
-                GetData(data);
-            }
-        },
-        error: function (error) {
-            console.error(error);
-        }
-    });
-}*/
+
 
 
 (function GetData() {
@@ -98,7 +81,5 @@ function ConnectToDatabase(link, type, status) {
     }
 })();
 
-
-//ConnectToDatabase('/api/GetProgressbar/', 'GET')
 var timerInterval;
 
