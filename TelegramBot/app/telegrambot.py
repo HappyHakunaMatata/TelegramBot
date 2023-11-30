@@ -80,6 +80,25 @@ async def kick_user(message):
         await bot.send_message(message.from_user.id, "Все пользователи удалены")
     except Exception as err:
         logging.error(f"Произошла ошибка: {err}")
+        
+@bot.message_handler(commands=['kickanonymous'])
+async def kick_anonymous(message):
+    try:
+        members = await GetAllMembers()
+        admin = any(map(lambda x: x.id == message.from_user.id, members["admins"]))
+        if (admin == False):
+            await bot.send_message(message.from_user.id, "Недостаточно прав для выполнения операции")
+            return
+        users = list(map(lambda x: x.id, members["unidentified"]))
+        if (len(users) == 0):
+            await bot.send_message(message.from_user.id, "Нет пользователей для удаления")
+            return
+        for i in users:
+            await bot.kick_chat_member(public_chat_id, i)
+        await DeleteRemovedUsers()
+        await bot.send_message(message.from_user.id, "Все пользователи удалены")
+    except Exception as err:
+        logging.error(f"Произошла ошибка: {err}")
 
 @bot.message_handler(commands=['house'])
 async def admin(message):
@@ -270,14 +289,16 @@ async def GetAllMembers():
             admins = await client.get_participants(entity, filter=ChannelParticipantsAdmins)
             all_participants = await client.get_participants(entity, limit=None)
             users = [participant for participant in all_participants if participant not in admins]
+            unidentified_users = [u for u in users if u.phone is None]
             phones =  map(lambda x: x.phone, users)
             phones = [phone for phone in phones if phone is not None]
             admins = list(map(lambda x: x, admins))
             users =  list(map(lambda x: x, users))
-        return {"users": users,"admins": admins, "phones":phones}
+        return {"users": users,"admins": admins, "phones":phones, "unidentified": unidentified_users}
     except Exception as err:
        print(f"Произошла ошибка: {err}")
 
+             
 
 async def DeleteRemovedUsers():
     try:
@@ -350,7 +371,7 @@ async def Bitrix():
         contact_id = set(map(lambda x: x, id['CONTACT'])) #Множество id пользователей тг
         expired = list(contact_id - deals) #Список тех кто уже не проживает
         clients = bx24.callMethod('crm.contact.list', filter={'ID':expired}, select = ['ID', 'PHONE']) #Получить список выехавших
-        clients_phones = list(map(lambda x: int(x["PHONE"][0]["VALUE"]), clients)) #Получить список номеров выехавших
+        clients_phones = list(map(lambda x: str(x["PHONE"][0]["VALUE"]), clients)) #Получить список номеров выехавших
         for i in members["users"]: #Кикаем
             if (i.phone in clients_phones):
                 await bot.kick_chat_member(public_chat_id, i.id) #Кик по id
@@ -364,6 +385,6 @@ async def Bitrix():
 
 def Run():
     try:
-        asyncio.run(bot.polling())
+        asyncio.run(bot.infinity_polling(interval=0, timeout=20))
     except Exception as e:
         logging.error(f"Произошла ошибка: {e}")
