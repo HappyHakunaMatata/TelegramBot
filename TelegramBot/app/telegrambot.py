@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 import os
 import sys
 from django.utils import timezone
-stopfrom time import sleep
+from time import sleep
 
 
     
