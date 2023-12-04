@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 import os
 import sys
 from django.utils import timezone
+stopfrom time import sleep
 
 
     
@@ -355,6 +356,19 @@ async def PrintSessions():
     finally:
         client.disconnect()
 
+async def StartBot():
+    print("Starting bot polling now")
+    while True:
+        try:
+            await bot.infinity_polling()
+        except Exception as ex: 
+            print("Bot polling failed, restarting in {}sec. Error:\n{}".format(30, ex))
+            await bot.close_session()
+            sleep(30)
+        else: #Clean exit
+            await bot.close_session()
+            print("Bot polling loop finished")
+            break #End loop
 
 async def Bitrix():
     bx24 = Bitrix24(bitrix24_api)
@@ -385,6 +399,6 @@ async def Bitrix():
 
 def Run():
     try:
-        asyncio.run(bot.infinity_polling(interval=0, timeout=20))
+        asyncio.run(StartBot())
     except Exception as e:
         logging.error(f"Произошла ошибка: {e}")
